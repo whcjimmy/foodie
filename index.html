@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+    <head>
+	<title>美食地圖</title>
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+	<link rel="shortcut icon" href="http://cartodb.com/assets/favicon.ico" />
+	<style>
+	    html, body, #map {
+		height: 100%;
+		width: 100%;
+		padding: 0;
+		margin: 0;
+	    }	   
+
+	    #search-row {
+		position: relative;
+		bottom: 170px;
+		left: 5px;
+		width:100px;
+		height: 30px;
+		z-index: 1;
+	    }
+
+	    #search {
+		height: 80%;
+		font-size:90%;
+		border-style:solid;
+		border-color:#4B7B9F;
+		border-width:2px;
+	    }
+
+	    #one, #two, #three, #four, #five {
+		display: none;
+		padding: 5px;
+	    }
+
+	    #div1, #div2, #div3, #div4, #div5, #divs {
+		margin: 5px;
+		left: 2px;
+	    }
+
+	    #l1, #l2, #l3, #l4, #l5{
+		border-style:solid;
+		border-color:rgb(136, 136, 136);
+		background-color:rgb(204, 204, 204);
+	    }
+
+	    #one:checked + #l1{
+		border-style:solid;
+		border-color:rgb(153, 153, 255);
+		background-color:rgb(178, 178, 255);
+	    }
+
+	    #two:checked + #l2{
+		border-style:solid;
+		border-color:rgb(154, 255, 154);
+		background-color:rgb(179, 255, 179);
+	    }
+
+	    #three:checked + #l3{
+		border-style:solid;
+		border-color:rgb(255, 255, 153);
+		background-color:rgb(255, 255, 178);
+	    }
+
+	    #four:checked + #l4{
+		border-style:solid;
+		border-color:rgb(255, 154, 255);
+		background-color:rgb(255, 179, 255);
+	    }
+
+	    #five:checked + #l5{
+		border-style:solid;
+		border-color:rgb(255, 103, 103);
+		background-color:rgb(255, 128, 128);
+	    }
+
+	</style>
+
+	<link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" />
+	<script>
+	    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	    ga('create', 'UA-70451659-1', 'auto');
+	    ga('send', 'pageview');
+
+	</script>
+    </head>
+    <body>
+	<div id="map"></div>
+	<script type="infowindow/html", id="infowindow_template">
+	    <div class="cartodb-popup v2" style="font-family: 'Open Sans'">
+		<a href="#close" class="cartodb-popup-close-button close">x</a>
+		<div class="cartodb-popup-content-wrapper">
+		    <div class="cartodb-popup-header">
+			<h4 style="margin-left: -15px; margin-right: -15px; width: auto; margin-top: -15px; padding: 14px; text-align:center; color:white; font-weight: normal; background:{{color}}; text-transform: none; font-size: 20px">{{name}}</h4><br>
+		    </div>
+		    <div class="cartodb-popup-content">
+			<h4 style="color: rgb({section_color}}); text-transform: none; font-size: 10px; font-weight: normal">評分</h4>
+			<p style="font-size: 12px; color: #999; margin-top: 0px;">{{score}} {{short_comments}}</p>
+			<h4 style="color: rgb({section_color}}); text-transform: none; font-size: 10px; font-weight: normal">特色</h4>
+			<p style="font-size: 12px; color: #999; margin-top: 0px;">{{characteristic}}</p>
+			<h4 style="color: rgb({section_color}}); text-transform: none; font-size: 10px; font-weight: normal">評論</h4>
+			<p style="font-size: 12px; color: #999; margin-top: 0px;">{{comments}}</p>
+			<a href='http://www.google.com.tw/?gws_rd=ssl#q= {{name}}' target = '_blank'>線上搜尋</a>
+			<nobr style="white-space:nowrap;">|</nobr>
+			<a href='http://www.google.com.tw/maps/dir//{{name}}' target = '_blank'>立即導航</a>
+		    </div>
+		</div>
+		<div class="cartodb-popup-tip-container"></div>
+	    </div>
+	</script>
+
+	<div id="search-row">
+	    <div id="div5">
+		<input type = "checkbox" checked = "checked" name = "score" id="five"  value="5"><label for="five"  id="l5">5&#9734;</label><br>
+	    </div>
+	    <div id="div4">
+		<input type = "checkbox" checked = "checked" name = "score" id="four"  value="4"><label for="four"  id="l4">4&#9734;</label><br>
+	    </div>
+	    <div id="div3">
+		<input type = "checkbox" checked = "checked" name = "score" id="three" value="3"><label for="three" id="l3">3&#9734;</label><br>
+	    </div>
+	    <div id="div2">
+		<input type = "checkbox" checked = "checked" name = "score" id="two"   value="2"><label for="two"   id="l2">2&#9734;</label><br>
+	    </div>
+	    <div id="divs">
+		<form action="javascript:void(0);" style="display:inline;">
+		    <input type = "text" id="search" placeholder = "搜尋" size="10" />
+		</form>
+	    </div>
+	</div>
+
+	<!-- include cartodb.js library -->
+	<script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
+
+	<script>
+	    // create layer selector
+
+	    function createSelector(layer) {
+		var $options = $('#search-row input');
+		$options.click(function(e) {
+		    setQueryString(layer);
+		});
+
+		$options.keypress(function(e) {
+		    if(e.which == 13) {
+			document.getElementById("search").blur();
+			setQueryString(layer);
+			return false;
+		    }
+		});
+	    }
+
+	    function setQueryString(layer) {
+		var sql = new cartodb.SQL({ user: 'z36884' });
+
+		var query = 'SELECT * FROM map WHERE ';
+
+		var search = document.getElementById('search').value;
+		if (search) {
+		    search = search.replace(/'/g, '\\\'');
+		    query = query + "hideinfo LIKE '%" + search + "%' AND ";
+		}
+
+		var filter = [];
+		var scores= document.getElementsByName('score');
+		for (var i = 0, score; score = scores[i]; i++) {
+		    if (score.checked) {
+			var scoreNumber = score.value;
+			filter.push("'" + scoreNumber + "'");
+		    }
+		}
+
+		if (filter.length) {
+		    query = query + "score IN (" + filter.join(',') + ")";
+		    } else {
+		    query = query + "score IN ('6')";
+		}
+
+		// change the query in the layer to update the map
+		layer.setSQL(query);
+	    }
+
+	    function main() {
+
+		//Geolocation // Try HTML5 geolocation.
+		function updateCoordinate(callback) {
+		    if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(function(position) {
+			    var options = {
+				center: [position.coords.latitude, position.coords.longitude], 
+				zoom: 16,
+				tiles_loader: true
+			    };
+			    callback(options);
+			    }, function() { 
+			    var options = {
+				center: [22.997184, 120.212577], 
+				zoom: 16,
+				tiles_loader: true
+			    };
+			    callback(options);
+			});
+			} else {
+			var options = {
+			    center: [22.997184, 120.212577], 
+			    zoom: 16,
+			    tiles_loader: true
+			};
+			callback(options);
+		    }
+		}
+
+		updateCoordinate(function (options) { 
+		    cartodb.createVis('map', 'https://z36884.cartodb.com/api/v2/viz/95b0bd30-6458-11e5-8857-0e76aec36da9/viz.json', options) .done(function(vis, layers) {
+			// layer 0 is the base layer, layer 1 is cartodb layer
+			var subLayer = layers[1].getSubLayer(0);
+			subLayer.infowindow.set('template', $('#infowindow_template').html());
+			createSelector(subLayer);
+
+			vis.addOverlay({
+			    type: 'tooltip',
+			    position: 'top|center',
+			    template: '<div class="cartodb-tooltip-content-wrapper"> <div class="cartodb-tooltip-content"> <h4>名稱</h4> <p size="14">{name}}</p> <h4>評價</h4> <p size="14">{score}}</p> <h4>特色</h4> <p size="14">{characteristic}}</p> </div> </div>'
+			});
+		    })
+		    .error(function(err) {
+			console.log(err);
+		    });
+		});
+	    }
+
+	    window.onload = main;
+	</script>
+    </body>
+</html>
